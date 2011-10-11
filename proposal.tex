@@ -19,7 +19,7 @@
 \begin{document}
 \maketitle
 
-\section{Motivation}
+\section{Problem Statement}
 
 Incident response, post-facto forensics, and network troubleshooting rely on
 the ability to quickly extract relevant information. To this end, security
@@ -55,61 +55,71 @@ determined. Our goal in this project is to build a system that can handle this
 use case with real-world data from UC Berkeley's 10-Gbps upstream link.
 
 \section{Roadmap}
-\label{sec:road}
+%\label{sec:road}
 
-\subsection{Storage}
-\label{sec:road:storage}
+%We set out to explore a non-relational design that allows for rich data models
+%and lends itself to distributed query processing. This element of the project
+%identifies what basic blocks of storage are necessary to preserve
+%application-specific semantics as network events are committed to persistence. 
 
-The storage component characterizes expressiveness and performance of the
-analytic system. We aim to explore a non-relational design that allows for rich
-data models and lends itself to distributed query processing. This element of
-the project identifies what basic blocks of storage are necessary to preserve
-application-specific semantics as network events are committed to persistence. 
+%% The following describes basic
+%% components of storage that facilitate query processing over semantically rich
+%% data. 
+%% \begin{description}
+%%   \item[Events] are the highest granularity of components that are stored
+%%     in VAST. Each source that wishes to contribute to the VAST corpora generates
+%%     highly structured objects that correspond to network events.
+%%   \item[Tablets] encompass several events that characteristically merit locality
+%%     and can thus be grouped together. Within a tablet, it is possible to select
+%%     columns of data spanning several events, and this provides efficient
+%%     primitives for query processing. Currently, tablets will represent a small
+%%     time range, and we assign each tablet a UUID to later identify them. 
+%%   \item[Multiple indices] are not stored primitives per se, but they are
+%%     essential in data look-up and can contribute to efficient processing.
+%%     Multiple indices will also aid in preserving the semantic richness of data
+%%     by encompassing information relating multiple events. For example, discrete
+%%     events may belong to the same TCP stream, and we may be able to provide an
+%%     index where a set of events are associated with unique TCP steams.
+%% \end{description}
 
-Then, given an abstract model of data, we aim to identify an architecture of storage
-that meets interactive query response times with simultaneous high-throughput
-data archival. The goal is to create a hybrid system that supports queries on
-historical data as well as incoming data, and to do this, the naturally
-parallel nature of non-relational data stores provide an ideal starting point.
-We aim to expand on these systems by providing aforementioned indices and
-efficient range scans. This architecture should provide modularity and horizontal
-scalability such that different workloads can adopt varying deployment sizes
-without needing to modify the core design of our system.
+Given a rich model data, we aim to identify a storage architecture that meets
+interactive query response times with simultaneous high-throughput archival.
+The goal is to create a hybrid system that supports both queries on
+historical data as well as incoming streaming data, and to do this, the
+naturally parallel nature of non-relational data stores provide an ideal
+starting point. We plan to expand on these systems by providing indexes and
+efficient range scans. This architecture should provide modularity and
+horizontal scalability such that different workloads can adopt varying
+deployment sizes without needing to modify the core design of the system.
 
-\subsection{Basic Query Processing}
-\label{sec:road:query}
+As a short-term goal, we intend to support selections and projections
+over data with interactive query response times. Leveraging knowledge from
+current database research, we also design a distributed query architecture
+that we aim to implement with a SQL-like interface to the end user.
 
-As a short-term goal, we intend to support selections and projections over data
-with interactive query response times. This suggests an exploration of
-distributed query processing. We will present a SQL-like query interface to the
-end user and translate it to a distributed query execution plan.
+%\subsection{Forensics and Incident Response}
+%\label{sec:eval:forensics}
+%To validate the effectiveness of VAST, we will present a data exploration task and
+%show how VAST facilitates navigation of the data in a flexible manner. This suggests
+%we identify a metric of interactivity for network forensics as well as describe
+%enabling primitives provided by VAST for pinpointing network events. If mature, we
+%will show incident response schemes that can programatically identify events of
+%forensic interest. 
 
-\section{Evaluation: Forensics and Incident Response}
-\label{sec:eval}
-
-To validate the effectiveness of our system, we will present a data exploration
-task and show how we facilitate navigation of the data in a flexible manner.
-This suggests we identify a metric of interactivity for network forensics as
-well as describe enabling primitives provided for pinpointing network events.
-If mature, we will show incident response schemes that can programatically
-identify events of forensic interest. 
 \section{Related Work}
 
-%
-% Bits and Pieces
-%
 \begin{description}
 \item[DBMS and DSMS]
 Traditionally, data base management systems support historical queries over
 already-archived data while data stream management systems support live queries
-that incorporate newly arriving data after a query is issued. Our work merges these
+that incorporate newly arriving data after a query is issued. We merge these
 into a hybrid system~\cite{Reiss07} much like TelegraphCQ~\cite{Chandrasekaran03}.
 
 \item[OLAP]
-An alternative perspective of the query workload that our system supports is
-described by online analytical processing systems which, given a database
-warehouse of bulk-loaded data, allow for immutable data processing. However, our
-aim differs fundamentally from existing OLAP systems in supporting side-by-side
+An alternative perspective of the query workload that we support is described
+by online analytical processing systems which, given a database warehouse of
+bulk-loaded data, allow for immutable data processing. However, our system
+differs fundamentally from existing OLAP systems in supporting side-by-side
 execution of both queries and data archival.
 
 \item[NoSQL]
@@ -122,16 +132,16 @@ storage will also help address the challenge of performing data archiving in
 light of expansive amounts of incoming data.
 
 \item[Network Security]
-Finally, we explore Time Machine~\cite{Maier08} which aims to record network
-traffic for future inspection. Time Machine is similar in goal to our project
-in that it provides high-performance network traffic capture, indexing, and
-retrieval; we extend these concepts to arbitrary events that can stem from a wide
-range of sources. Further, a major limitation of Time Machine is that it works
-only on a local machine while we aim to scale in a cluster setting.
+The Time Machine~\cite{Maier08} records raw packet-level network
+traffic for future inspection. Time Machine is similar to our approach in that
+it handles a high-performance network traffic stream, indexing, and retrieval;
+we extend these concepts to arbitrary events that can stem from a wide range
+of sources. Further, a major limitation of Time Machine is that it works only on
+a local machine while we aim to scale in a cluster setting.
 
 \end{description}
 
 \bibliographystyle{abbrv}
-\bibliography{nsa}
+\bibliography{../vast}
 
 \end{document}
